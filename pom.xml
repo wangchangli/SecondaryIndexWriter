@@ -206,7 +206,7 @@
         <configuration>
             <archive>
                 <manifest>
-                    <mainClass>com.xingcloud.adhocprocessorV2.query.XAQueryDEUCoprocessorServer</mainClass>
+                    <mainClass>com.xingcloud.xa.secondaryindex.SecondaryIndexWriter</mainClass>
                 </manifest>
             </archive>
             <descriptorRefs>

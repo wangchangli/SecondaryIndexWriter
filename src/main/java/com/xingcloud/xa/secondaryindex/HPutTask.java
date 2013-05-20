@@ -124,8 +124,11 @@ public class HPutTask implements Runnable  {
       
     }
 
-    for(Map.Entry<Index, Integer> entry:combieMap.entrySet()){
+    for(Map.Entry<Index, Integer> entry:combieMap.entrySet()){      
       Index index = entry.getKey();
+      
+      System.out.println(index.toString());
+      
       if(-1 == entry.getValue()){
         Delete delete = new Delete(QueryUtils.getUIIndexRowKey(index.getPropertyID(), Bytes.toBytes(index.getValue())));
         delete.deleteColumns(Constants.columnFamily.getBytes(), index.getUid().getBytes());

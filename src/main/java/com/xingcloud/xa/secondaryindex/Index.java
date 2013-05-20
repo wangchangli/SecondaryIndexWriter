@@ -48,6 +48,12 @@ public class Index {
     return (projectID + "_" + propertyID + "_" + uid).hashCode();  
   }
 
+
+  @Override
+  public String toString(){
+    return operation+"\t"+projectID+"\t"+uid+"\t"+value;
+  }
+  
   public void setProjectID(String projectID) {
     this.projectID = projectID;
   }
