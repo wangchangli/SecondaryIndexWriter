@@ -1,10 +1,9 @@
 package com.xingcloud.xa.secondaryindex;
 
-import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.xingcloud.xa.uidmapping.UidMappingUtil;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.hadoop.hbase.client.Put;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -34,19 +33,23 @@ public class IndexTailer extends Tail implements Runnable{
 
   @Override
   public void send(List<String> logs, long day) {
-    Map<String, List<Put>> putsMap =  dispatchPuts(logs);
-    ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(Constants.EXECUTOR_THREAD_COUNT,
-      Constants.EXECUTOR_THREAD_COUNT,
-      30,
-      TimeUnit.MINUTES,
-      new LinkedBlockingQueue<Runnable>());
-    
-    for(Map.Entry<String, List<Put>> entry: putsMap.entrySet()){
-      threadPoolExecutor.execute(new HPutTask(entry.getKey(), entry.getValue()));
+    try{
+      Map<String, Map<String, List<Index>>> putsMap =  dispatchPuts(logs);
+      ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(Constants.EXECUTOR_THREAD_COUNT,
+        Constants.EXECUTOR_THREAD_COUNT,
+        30,
+        TimeUnit.MINUTES,
+        new LinkedBlockingQueue<Runnable>());
+      
+      for(Map.Entry<String, Map<String, List<Index>>> entry: putsMap.entrySet()){
+        threadPoolExecutor.execute(new HPutTask(entry.getKey(), entry.getValue()));
+      }
+      
+      threadPoolExecutor.shutdown();
+    } catch (Exception e) {
+      LOG.error(e.getMessage());
+      throw new RuntimeException(e.getMessage());
     }
-    
-    threadPoolExecutor.shutdown();
-    
   }
 
   @Override
@@ -58,31 +61,41 @@ public class IndexTailer extends Tail implements Runnable{
     }
   }
   
-  private Map<String, List<Put>> dispatchPuts(List<String> logs) throws IOException {
-    Map<String, List<Put>> putsMap = new HashMap<String, List<Put>>();
+  private Map<String, Map<String, List<Index>>> dispatchPuts(List<String> logs) throws IOException {
+    Map<String, Map<String, List<Index>>> putsMap = new HashMap<String, Map<String, List<Index>>>();
     ObjectMapper mapper = new ObjectMapper();
     for(String log: logs){
+      
       Map<String,Object> data = mapper.readValue(log.getBytes(), Map.class);
       String projectID = (String)data.get("pid");
       String uid = (String)data.get("uid");
       String propertyID = (String)data.get("propertyID");
       String oldValue = (String)data.get("oldValue");
       String newValue = (String)data.get("newValue");
-      Boolean delete = (Boolean)data.get("delete");
-
-      Put put = new Put();
-      put.setWriteToWAL(Constants.deuTableWalSwitch);
+      Boolean needDelete = (Boolean)data.get("delete");
       
-      if(putsMap.containsKey(projectID)){        
-        putsMap.get(projectID).add(put);
-      }else{
-        putsMap.put(projectID, new ArrayList<Put>());
-        putsMap.get(projectID).add(put);
+      Index put = new Index(projectID, uid, propertyID, newValue, "put");   
+      Index delete = null;
+      
+      if (needDelete){
+        delete = new Index(projectID, uid, propertyID, oldValue, "delete");    
+      }
+
+      //String hbaseAddress = UidMappingUtil.getInstance().hash(Long.valueOf(uid));
+      String hbaseAddress = "localhost";
+      
+      if(! putsMap.containsKey(projectID)){
+        putsMap.put(projectID, new HashMap<String, List<Index>>());
       }
       
+      if(! putsMap.get(projectID).containsKey(hbaseAddress)){
+        putsMap.get(projectID).put(hbaseAddress, new ArrayList<Index>());   
+      }
+      
+      if (delete != null ) putsMap.get(projectID).get(hbaseAddress).add(delete);
+      putsMap.get(projectID).get(hbaseAddress).add(put);
+      
     }  
-    
-    
     return putsMap;
   }
   

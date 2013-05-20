@@ -14,6 +14,6 @@ public class SecondaryIndexWriter {
   private static final Log LOG = LogFactory.getLog(SecondaryIndexWriter.class);
   
   public static void main(String args[]){
-    new Thread(new IndexTailer("/data/log/secondaryindex/")).start();    
+    new Thread(new IndexTailer("/data/log/secondaryindexconfig/")).start();    
   }
 }
