@@ -253,6 +253,7 @@ public abstract class Tail {
 
     //日期向下滚动一天
     public void rollDay() {
+        System.out.println("Today is:"+this.day);
         this.day = TimeUtil.nextDay(this.day);
         this.dayStartTime = TimeUtil.dayToTptime(this.day);
     }

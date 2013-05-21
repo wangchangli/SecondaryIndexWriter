@@ -19,7 +19,7 @@ public class Index {
     this.uid = uid;
     this.propertyID = propertyID;
     this.value = value;
-    this.value = operation;
+    this.operation = operation;
   }
 
 
