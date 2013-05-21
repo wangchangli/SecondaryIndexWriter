@@ -11,7 +11,7 @@ public class Index {
   private String projectID;
   private String uid;
   private String propertyID;
-  private String value;
+  private String value="";
   private String operation;
   
   public Index(String projectID, String uid, String propertyID , String value, String operation){
@@ -44,8 +44,12 @@ public class Index {
   }
   
   @Override
+  public boolean equals(Object o){
+    return (this.hashCode() == o.hashCode());  
+  }
+  @Override
   public int hashCode(){
-    return (projectID + "_" + propertyID + "_" + uid).hashCode();  
+    return (projectID + "_" + propertyID + "_" + value +"_"+ uid).hashCode();  
   }
 
 
