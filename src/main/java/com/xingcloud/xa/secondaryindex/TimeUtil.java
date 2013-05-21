@@ -75,4 +75,8 @@ public class TimeUtil {
         long now = System.currentTimeMillis();
         return getDay(now);
     }
+  
+    public static void main(String[] args){
+      System.out.println(nextDay(20130520));
+    }
 }

@@ -51,7 +51,7 @@ public class Index {
 
   @Override
   public String toString(){
-    return operation+"\t"+projectID+"\t"+uid+"\t"+value;
+    return operation+"\t"+projectID+"\t"+uid+"\t"+propertyID+"\t"+value;
   }
   
   public void setProjectID(String projectID) {

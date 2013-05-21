@@ -106,7 +106,9 @@ public class HPutTask implements Runnable  {
 
     Map<Index, Integer> combieMap = new HashMap<Index, Integer>();
     int operation;
+    System.out.println("Before optimize:");
     for(Index index: indexs){
+      System.out.println(index.toString());
       operation = 1;
       if(index.getOperation().equals("delete")){
         operation = -1;
@@ -123,7 +125,8 @@ public class HPutTask implements Runnable  {
       }
       
     }
-
+    
+    System.out.println("After optimize:");
     for(Map.Entry<Index, Integer> entry:combieMap.entrySet()){      
       Index index = entry.getKey();
       

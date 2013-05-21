@@ -253,9 +253,10 @@ public abstract class Tail {
 
     //日期向下滚动一天
     public void rollDay() {
-        System.out.println("Today is:"+this.day);
+        System.out.println("Now day is:"+this.day);
         this.day = TimeUtil.nextDay(this.day);
         this.dayStartTime = TimeUtil.dayToTptime(this.day);
+        System.out.println("Next day is:"+this.day);
     }
 
     //保存进度文件，实际是做了个重命名操作
