@@ -2,6 +2,7 @@ package com.xingcloud.xa.secondaryindex.utils;
 
 import com.xingcloud.mysql.MySql_fixseqid;
 import com.xingcloud.mysql.UserProp;
+import com.xingcloud.xa.secondaryindex.Constants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
@@ -34,11 +35,16 @@ public class QueryUtils {
 
     private static long BYTES_4 = 0xffffffffl;
 
+    public static Map<String, Integer> attrMap = new HashMap<String, Integer>();
+    
+    static {
+      initAttrMap();
+    }
     public static List<UserProp> getUserProps(String pID) throws SQLException {
         return MySql_fixseqid.getInstance().getUserProps(pID);
     }
 
-    public static Map<String, Integer> attrMap = new HashMap<String, Integer>();
+   
 
     public static Long getDateValInMySql(String date, boolean isBegin) {
         date = date.replace("-", "");
@@ -141,6 +147,8 @@ public class QueryUtils {
 
     public static void initAttrMap() {
         Configuration conf = HBaseConfiguration.create();
+        conf.set("hbase.zookeeper.quorum", "ELEX-LA-TEST1");
+        conf.set("hbase.zookeeper.property.clientPort", Constants.HBASE_PORT);
         HTable hTable = null;
 
         try {

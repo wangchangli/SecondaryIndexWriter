@@ -40,7 +40,7 @@ public class Index {
   }
 
   public String getOperation() {
-    return value;
+    return operation;
   }
   
   @Override

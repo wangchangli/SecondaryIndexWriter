@@ -47,12 +47,12 @@ public class HPutTask implements Runnable  {
     try{
     for (Map.Entry<String, List<Index>> entry : indexs.entrySet()) {
       boolean putHbase = true;
-      while (putHbase) {
+        while (putHbase) {
         HTable table = null;
         long currentTime = System.currentTimeMillis();
         try {
 
-          table = new HTable(HBaseConf.getInstance().getHBaseConf(entry.getKey()),QueryUtils.getUIIndexTableName(tableName, null));
+          table = new HTable(HBaseConf.getInstance().getTestHBaseConf(entry.getKey()),QueryUtils.getUIIndexTableName(tableName, null));
           LOG.info(tableName + " init htable .." + currentTime);
           table.setAutoFlush(false);
           table.setWriteBufferSize(Constants.WRITE_BUFFER_SIZE);
@@ -95,55 +95,59 @@ public class HPutTask implements Runnable  {
       }
     }   
     }catch (Exception e){
-      
+      e.printStackTrace();  
     }
   }
   
   private Pair<List<Delete>, List<Put>> optimizePuts(List<Index> indexs){
-    Pair<List<Delete>, List<Put>> result = new Pair<List<Delete>, List<Put>>();
-    result.setFirst(new ArrayList<Delete>());
-    result.setSecond(new ArrayList<Put>());
+ 
+      Pair<List<Delete>, List<Put>> result = new Pair<List<Delete>, List<Put>>();
+      try{
+        result.setFirst(new ArrayList<Delete>());
+        result.setSecond(new ArrayList<Put>());
 
-    Map<Index, Integer> combieMap = new HashMap<Index, Integer>();
-    int operation;
-    System.out.println("Before optimize:");
-    for(Index index: indexs){
-      System.out.println(index.toString());
-      operation = 1;
-      if(index.getOperation().equals("delete")){
-        operation = -1;
-      }
-      
-      if(!combieMap.containsKey(index)){
-        combieMap.put(index, operation);  
-      }else{
-        int i = combieMap.get(index) + operation;
-        if(i>1) i = 1;
-        if(i<-1) i = -1;
-        combieMap.put(index, i); 
-        index.setValue(index.getValue());
-      }
-      
-    }
+        Map<Index, Integer> combineMap = new HashMap<Index, Integer>();
+        int operation;
+        
+        System.out.println("Before optimize:");
+        for(Index index: indexs){
+          System.out.println(index.toString());
+          operation = 1;
+          if(index.getOperation().equals("delete")){
+            operation = -1;
+          }
+          
+          if(!combineMap.containsKey(index)){
+            combineMap.put(index, operation);  
+          }else{
+            int i = combineMap.get(index) + operation;
+            if(i>1) i = 1;
+            if(i<-1) i = -1;
+            combineMap.put(index, i);
+          }     
+        }
+        
+        System.out.println("After optimize:");
+        for(Map.Entry<Index, Integer> entry:combineMap.entrySet()){      
+          Index index = entry.getKey();
+          if(Math.abs(entry.getValue())==1)System.out.println(index.toString());
     
-    System.out.println("After optimize:");
-    for(Map.Entry<Index, Integer> entry:combieMap.entrySet()){      
-      Index index = entry.getKey();
-      
-      System.out.println(index.toString());
-      
-      if(-1 == entry.getValue()){
-        Delete delete = new Delete(QueryUtils.getUIIndexRowKey(index.getPropertyID(), Bytes.toBytes(index.getValue())));
-        delete.deleteColumns(Constants.columnFamily.getBytes(), index.getUid().getBytes());
-        delete.setWriteToWAL(Constants.deuTableWalSwitch);
-        result.getFirst().add(delete);
-      }else if (1 == entry.getValue()){
-        Put put = new Put(QueryUtils.getUIIndexRowKey(index.getPropertyID(), Bytes.toBytes(index.getValue())));
-        put.setWriteToWAL(Constants.deuTableWalSwitch);
-        put.add(Constants.columnFamily.getBytes(), index.getUid().getBytes(), index.getValue().getBytes());
-        result.getSecond().add(put);
-      }
-    }
+          byte[] row = QueryUtils.getUIIndexRowKey(index.getPropertyID(), Bytes.toBytes(index.getValue()));
+          if(-1 == entry.getValue()){
+            Delete delete = new Delete(row);
+            delete.deleteColumns(Constants.columnFamily.getBytes(), index.getUid().getBytes());
+            delete.setWriteToWAL(Constants.deuTableWalSwitch);
+            result.getFirst().add(delete);
+          }else if (1 == entry.getValue()){
+            Put put = new Put(row);
+            put.setWriteToWAL(Constants.deuTableWalSwitch);
+            put.add(Constants.columnFamily.getBytes(), index.getUid().getBytes(),Bytes.toBytes("0"));
+            result.getSecond().add(put);
+          }
+        }
+     }catch(Exception e){
+        e.printStackTrace(); 
+     }
     return result;
   }
 

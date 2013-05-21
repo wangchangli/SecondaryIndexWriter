@@ -82,7 +82,7 @@ public class IndexTailer extends Tail implements Runnable{
       }
 
       //String hbaseAddress = UidMappingUtil.getInstance().hash(Long.valueOf(uid));
-      String hbaseAddress = "localhost";
+      String hbaseAddress = "ELEX-LA-TEST1";
       
       if(! putsMap.containsKey(projectID)){
         putsMap.put(projectID, new HashMap<String, List<Index>>());

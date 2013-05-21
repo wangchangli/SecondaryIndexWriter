@@ -36,4 +36,11 @@ public class HBaseConf {
     public Configuration getHBaseConf(String hbaseAddress) {
         return confs.get(hbaseAddress);
     }
+  
+    public Configuration getTestHBaseConf(String hbaseAddress){
+      Configuration conf = HBaseConfiguration.create();
+      conf.set("hbase.zookeeper.quorum", hbaseAddress);
+      conf.set("hbase.zookeeper.property.clientPort", Constants.HBASE_PORT);
+      return conf;
+    }
 }
