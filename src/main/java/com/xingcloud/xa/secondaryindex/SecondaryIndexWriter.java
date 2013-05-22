@@ -24,6 +24,7 @@ public class SecondaryIndexWriter {
   private static final Log LOG = LogFactory.getLog(SecondaryIndexWriter.class);
   
   public static void main(String args[]){
+    LOG.info("Start secondary writer service...");
     new Thread(new IndexTailer("/data/log/secondaryindexconfig/")).start();
     //System.out.print(Bytes.toStringBinary(Bytes.toBytes(554062796504L)));
   }

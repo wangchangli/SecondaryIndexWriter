@@ -102,6 +102,7 @@ public abstract class Tail {
                         //存在新的日志文件
                         break;
                     }
+                  
                     Thread.sleep(sleepTime);
                 } else {
                     //如果readline拿到的line不是以\n结尾，说明这一行没有读完整；继续读直到出现\n的line，合成一行

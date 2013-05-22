@@ -46,7 +46,7 @@ public class IndexTailer extends Tail implements Runnable{
       }
       
       threadPoolExecutor.shutdown();
-      boolean result = threadPoolExecutor.awaitTermination(20, TimeUnit.SECONDS);
+      boolean result = threadPoolExecutor.awaitTermination(30, TimeUnit.MINUTES);
       if (!result) {
         LOG.warn("put index timeout....throws this exception to tailer and quit this.");
         threadPoolExecutor.shutdownNow();
