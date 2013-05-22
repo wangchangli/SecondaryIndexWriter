@@ -9,12 +9,12 @@ package com.xingcloud.xa.secondaryindex;
  */
 public class Index {
   private String projectID;
-  private String uid;
-  private String propertyID;
+  private long uid;
+  private int propertyID;
   private String value="";
   private String operation;
   
-  public Index(String projectID, String uid, String propertyID , String value, String operation){
+  public Index(String projectID, long uid, int propertyID , String value, String operation){
     this.projectID = projectID;
     this.uid = uid;
     this.propertyID = propertyID;
@@ -27,11 +27,11 @@ public class Index {
     return projectID;
   }
 
-  public String getUid() {
+  public long getUid() {
     return uid;
   }
 
-  public String getPropertyID() {
+  public int getPropertyID() {
     return propertyID;
   }
 
@@ -62,11 +62,11 @@ public class Index {
     this.projectID = projectID;
   }
 
-  public void setUid(String uid) {
+  public void setUid(long uid) {
     this.uid = uid;
   }
 
-  public void setPropertyID(String propertyID) {
+  public void setPropertyID(int propertyID) {
     this.propertyID = propertyID;
   }
 

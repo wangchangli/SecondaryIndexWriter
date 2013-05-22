@@ -26,7 +26,7 @@ import java.util.Map;
 public class HPutTask implements Runnable  {
   private static final Log LOG = LogFactory.getLog(SecondaryIndexWriter.class); 
   private String tableName;
-  private Map<String,List<Index>> indexs;
+  private Map<String,List<Index>> indexs; //key:every hbase node
   
   private static Map<String, Boolean> tables;
   private static HBaseAdmin admin;
@@ -52,7 +52,7 @@ public class HPutTask implements Runnable  {
         long currentTime = System.currentTimeMillis();
         try {
 
-          table = new HTable(HBaseConf.getInstance().getTestHBaseConf(entry.getKey()),QueryUtils.getUIIndexTableName(tableName, null));
+          table = new HTable(HBaseConf.getInstance().getTestHBaseConf(entry.getKey()),QueryUtils.getUIIndexTableName(tableName));//todo wcl
           LOG.info(tableName + " init htable .." + currentTime);
           table.setAutoFlush(false);
           table.setWriteBufferSize(Constants.WRITE_BUFFER_SIZE);
@@ -109,9 +109,9 @@ public class HPutTask implements Runnable  {
         Map<Index, Integer> combineMap = new HashMap<Index, Integer>();
         int operation;
         
-        System.out.println("Before optimize:");
+        //System.out.println("Before optimize:");
         for(Index index: indexs){
-          System.out.println(index.toString());
+          //System.out.println(index.toString());
           operation = 1;
           if(index.getOperation().equals("delete")){
             operation = -1;
@@ -127,21 +127,21 @@ public class HPutTask implements Runnable  {
           }     
         }
         
-        System.out.println("After optimize:");
+        //System.out.println("After optimize:");
         for(Map.Entry<Index, Integer> entry:combineMap.entrySet()){      
           Index index = entry.getKey();
-          if(Math.abs(entry.getValue())==1)System.out.println(index.toString());
+          //if(Math.abs(entry.getValue())==1)System.out.println(index.toString());
     
           byte[] row = QueryUtils.getUIIndexRowKey(index.getPropertyID(), Bytes.toBytes(index.getValue()));
           if(-1 == entry.getValue()){
             Delete delete = new Delete(row);
-            delete.deleteColumns(Constants.columnFamily.getBytes(), index.getUid().getBytes());
+            delete.deleteColumns(Constants.columnFamily.getBytes(), QueryUtils.getFiveByte(index.getUid()));
             delete.setWriteToWAL(Constants.deuTableWalSwitch);
             result.getFirst().add(delete);
           }else if (1 == entry.getValue()){
             Put put = new Put(row);
             put.setWriteToWAL(Constants.deuTableWalSwitch);
-            put.add(Constants.columnFamily.getBytes(), index.getUid().getBytes(),Bytes.toBytes("0"));
+            put.add(Constants.columnFamily.getBytes(), QueryUtils.getFiveByte(index.getUid()),Bytes.toBytes("0"));
             result.getSecond().add(put);
           }
         }

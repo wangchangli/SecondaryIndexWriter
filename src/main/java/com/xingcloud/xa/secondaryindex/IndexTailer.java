@@ -47,6 +47,7 @@ public class IndexTailer extends Tail implements Runnable{
       
       threadPoolExecutor.shutdown();
     } catch (Exception e) {
+      e.printStackTrace();
       LOG.error(e.getMessage());
       throw new RuntimeException(e.getMessage());
     }
@@ -68,10 +69,10 @@ public class IndexTailer extends Tail implements Runnable{
       
       Map<String,Object> data = mapper.readValue(log.getBytes(), Map.class);
       String projectID = (String)data.get("pid");
-      String uid = (String)data.get("uid");
-      String propertyID = (String)data.get("propertyID");
-      String oldValue = (String)data.get("oldValue");
-      String newValue = (String)data.get("newValue");
+      long uid = Long.valueOf(String.valueOf(data.get("uid")));
+      int propertyID = Integer.valueOf(String.valueOf(data.get("propertyID")));
+      String oldValue = (String)data.get("old_value");
+      String newValue = (String)data.get("new_value");
       Boolean needDelete = (Boolean)data.get("delete");
       
       Index put = new Index(projectID, uid, propertyID, newValue, "put");   
@@ -82,7 +83,7 @@ public class IndexTailer extends Tail implements Runnable{
       }
 
       //String hbaseAddress = UidMappingUtil.getInstance().hash(Long.valueOf(uid));
-      String hbaseAddress = "ELEX-LA-TEST1";
+      String hbaseAddress = "ELEX-LA-TEST1";//todo wcl
       
       if(! putsMap.containsKey(projectID)){
         putsMap.put(projectID, new HashMap<String, List<Index>>());

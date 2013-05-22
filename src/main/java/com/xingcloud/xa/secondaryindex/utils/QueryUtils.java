@@ -65,7 +65,7 @@ public class QueryUtils {
         return dateInMysql;
     }
 
-    public static byte[] getUIRowKey(long suid) {
+    public static byte[] getFiveByte(long suid) {
         byte[] rk = new byte[5];
         rk[0] = (byte) (suid>>32 & 0xff);
         rk[1] = (byte) (suid>>24 & 0xff);
@@ -75,14 +75,13 @@ public class QueryUtils {
         return rk;
     }
 
-    public static byte[] getUIIndexRowKey(String attrName, byte[] attrVal) {
-        int index = attrMap.get(attrName);
-        byte[] rk = combineIndexRowKey(index, attrVal);
+    public static byte[] getUIIndexRowKey(int propertyID, byte[] attrVal) {
+        byte[] rk = combineIndexRowKey(propertyID, attrVal);
         return rk;
     }
 
-    public static String getUIIndexTableName(String pID, String attrName) {
-        return "property_" + pID + "_index_test";
+    public static String getUIIndexTableName(String pID) {
+        return pID + "_index_test";//todo wcl
     }
 
     public static String getUITableName(String pID, String attrName) {
