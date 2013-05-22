@@ -27,7 +27,7 @@ public class IndexTailer extends Tail implements Runnable{
   
   public IndexTailer(String configPath) {
     super(configPath);
-    setBatchSize(10000);
+    setBatchSize(6*10000);
     setLogProcessPerBatch(true);
   }
 
@@ -46,6 +46,12 @@ public class IndexTailer extends Tail implements Runnable{
       }
       
       threadPoolExecutor.shutdown();
+      boolean result = threadPoolExecutor.awaitTermination(20, TimeUnit.SECONDS);
+      if (!result) {
+        LOG.warn("put index timeout....throws this exception to tailer and quit this.");
+        threadPoolExecutor.shutdownNow();
+        throw new RuntimeException("put index timeout.");
+      }
     } catch (Exception e) {
       e.printStackTrace();
       LOG.error(e.getMessage());
