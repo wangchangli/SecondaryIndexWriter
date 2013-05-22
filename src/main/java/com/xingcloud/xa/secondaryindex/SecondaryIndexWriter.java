@@ -1,7 +1,9 @@
 package com.xingcloud.xa.secondaryindex;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.log4j.xml.DOMConfigurator;
 
 import java.util.HashMap;
@@ -22,6 +24,7 @@ public class SecondaryIndexWriter {
   private static final Log LOG = LogFactory.getLog(SecondaryIndexWriter.class);
   
   public static void main(String args[]){
-      new Thread(new IndexTailer("/data/log/secondaryindexconfig/")).start();
+    new Thread(new IndexTailer("/data/log/secondaryindexconfig/")).start();
+    //System.out.print(Bytes.toStringBinary(Bytes.toBytes(554062796504L)));
   }
 }

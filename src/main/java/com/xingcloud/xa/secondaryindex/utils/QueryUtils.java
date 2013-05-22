@@ -81,7 +81,7 @@ public class QueryUtils {
     }
 
     public static String getUIIndexTableName(String pID) {
-        return pID + "_index_test";//todo wcl
+        return pID + "_index";//todo wcl
     }
 
     public static String getUITableName(String pID, String attrName) {
