@@ -161,12 +161,12 @@
             <artifactId>jedis</artifactId>
             <version>2.2.0</version>
         </dependency>
-        
-          <dependency>
-              <groupId>hbase</groupId>
-              <artifactId>hbase</artifactId>
-              <version>0.94.6</version>
-          </dependency>
+
+        <dependency>
+            <groupId>org.apache.hbase</groupId>
+            <artifactId>hbase-xingcloud</artifactId>
+            <version>0.94.6</version>
+        </dependency>
 
           <dependency>
               <groupId>hadoop-core</groupId>
