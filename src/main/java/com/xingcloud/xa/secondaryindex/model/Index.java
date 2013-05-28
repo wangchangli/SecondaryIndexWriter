@@ -10,16 +10,19 @@ package com.xingcloud.xa.secondaryindex.model;
 public class Index {
   private String projectID;
   private long uid;
-  private int propertyID;
+  private int propertyID;//1 2 3
   private String value="";
   private String operation;
-  
-  public Index(String projectID, long uid, int propertyID , String value, String operation){
+  private String timestamp; //"20130101"
+
+
+  public Index(String projectID, long uid, int propertyID , String value, String operation, String timestamp){
     this.projectID = projectID;
     this.uid = uid;
     this.propertyID = propertyID;
     this.value = value;
     this.operation = operation;
+    this.timestamp = timestamp;
   }
 
 
@@ -49,13 +52,13 @@ public class Index {
   }
   @Override
   public int hashCode(){
-    return (projectID + "_" + propertyID + "_" + value +"_"+ uid).hashCode();  
+    return (projectID + "_" + propertyID + "_" + timestamp+"_"+value +"_"+ uid).hashCode();  
   }
 
 
   @Override
   public String toString(){
-    return operation+"\t"+projectID+"\t"+uid+"\t"+propertyID+"\t"+value;
+    return operation+"\t"+projectID+"\t"+propertyID+"\t"+timestamp+"\t"+value+"\t"+uid;
   }
   
   public void setProjectID(String projectID) {
@@ -76,5 +79,14 @@ public class Index {
 
   public void setOperation(String operation) {
     this.operation = operation;
+  }
+
+
+  public String getTimestamp() {
+    return timestamp;
+  }
+
+  public void setTimestamp(String timestamp) {
+    this.timestamp = timestamp;
   }
 }

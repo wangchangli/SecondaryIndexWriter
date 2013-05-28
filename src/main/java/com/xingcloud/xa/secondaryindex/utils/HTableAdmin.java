@@ -25,9 +25,9 @@ import java.util.Map;
  */
 public class HTableAdmin {
   private static Log LOG = LogFactory.getLog(HTableAdmin.class);
-  private static Map<String, HBaseAdmin> admins;
-  private static Map<String, Configuration> hbaseConfs;
-  private static Map<String, Map<String, Boolean>> tables;
+  private static Map<String, HBaseAdmin> admins = new HashMap<String, HBaseAdmin>();
+  private static Map<String, Configuration> hbaseConfs = new HashMap<String, Configuration>();
+  private static Map<String, Map<String, Boolean>> tables = new HashMap<String, Map<String, Boolean>>();
 
   public static Configuration getHBaseConf(String host) {
     return hbaseConfs.get(host);
@@ -41,9 +41,9 @@ public class HTableAdmin {
     return tables;
   }
  
-  public static void initHAdmin(){
+  public static void initHAdmin(String file){
     LOG.info("load hbase infomation");
-    Dom dom = ConfigReader.getDom("single_hbase.xml");
+    Dom dom = ConfigReader.getDom(file);
     List<Dom> hbaseDomList = dom.elements("hbase");
     for (Dom hbase : hbaseDomList) {
       String host = hbase.elementText("zookeeper");

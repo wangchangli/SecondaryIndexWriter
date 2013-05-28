@@ -3,7 +3,7 @@ package com.xingcloud.xa.secondaryindex;
 import com.xingcloud.xa.secondaryindex.model.Index;
 import com.xingcloud.xa.secondaryindex.utils.Constants;
 import com.xingcloud.xa.secondaryindex.utils.HTableAdmin;
-import com.xingcloud.xa.secondaryindex.utils.QueryUtils;
+import com.xingcloud.xa.secondaryindex.utils.WriteUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.hbase.client.Delete;
@@ -46,9 +46,9 @@ public class HPutTask implements Runnable  {
         HTable table = null;
         long currentTime = System.currentTimeMillis();
         try {
-          HTableAdmin.checkTable(entry.getKey(), tableName + "_index", "value"); // check if table is exist, if not create it
+          HTableAdmin.checkTable(entry.getKey(), WriteUtils.getUIIndexTableName(tableName), Constants.columnFamily); // check if table is exist, if not create it
           
-          table = new HTable(HTableAdmin.getHBaseConf(entry.getKey()),QueryUtils.getUIIndexTableName(tableName));//todo wcl
+          table = new HTable(HTableAdmin.getHBaseConf(entry.getKey()), WriteUtils.getUIIndexTableName(tableName));//todo wcl
           LOG.info(tableName + " init htable .." + currentTime);
           table.setAutoFlush(false);
           table.setWriteBufferSize(Constants.WRITE_BUFFER_SIZE);
@@ -128,16 +128,16 @@ public class HPutTask implements Runnable  {
           Index index = entry.getKey();
           //if(Math.abs(entry.getValue())==1)System.out.println(index.toString());
     
-          byte[] row = QueryUtils.getUIIndexRowKey(index.getPropertyID(), Bytes.toBytes(index.getValue()));
+          byte[] row = WriteUtils.getUIIndexRowKey(index.getPropertyID(), index.getTimestamp(), index.getValue());
           if(-1 == entry.getValue()){
             Delete delete = new Delete(row);
-            delete.deleteColumns(Constants.columnFamily.getBytes(), QueryUtils.getFiveByte(index.getUid()));
+            delete.deleteColumns(Constants.columnFamily.getBytes(), WriteUtils.getFiveByte(index.getUid()));
             delete.setWriteToWAL(Constants.deuTableWalSwitch);
             result.getFirst().add(delete);
           }else if (1 == entry.getValue()){
             Put put = new Put(row);
             put.setWriteToWAL(Constants.deuTableWalSwitch);
-            put.add(Constants.columnFamily.getBytes(), QueryUtils.getFiveByte(index.getUid()),Bytes.toBytes("0"));
+            put.add(Constants.columnFamily.getBytes(), WriteUtils.getFiveByte(index.getUid()),Bytes.toBytes("0"));
             result.getSecond().add(put);
           }
         }

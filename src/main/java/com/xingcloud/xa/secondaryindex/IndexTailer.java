@@ -81,16 +81,17 @@ public class IndexTailer extends Tail implements Runnable{
       int propertyID = Integer.valueOf(String.valueOf(data.get("propertyID")));
       String oldValue = (String)data.get("old_value");
       String newValue = (String)data.get("new_value");
+      String timestamp = (String)data.get("timestamp");
       Boolean needDelete = (Boolean)data.get("delete");
       
-      Index put = new Index(projectID, uid, propertyID, newValue, "put");   
+      Index put = new Index(projectID, uid, propertyID, newValue, "put", timestamp);   
       Index delete = null;
       
       if (needDelete){
-        delete = new Index(projectID, uid, propertyID, oldValue, "delete");    
+        delete = new Index(projectID, uid, propertyID, oldValue, "delete", timestamp);    
       }
 
-      //String hbaseAddress = UidMappingUtil.getInstance().hash(Long.valueOf(uid));
+      //String hbaseAddress = UidMappingUtil.getInstance().ha sh(Long.valueOf(uid));
       String hbaseAddress = "HBASE";//todo wcl
       
       if(! putsMap.containsKey(projectID)){
