@@ -1,7 +1,9 @@
 package com.xingcloud.xa.secondaryindex;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.xingcloud.xa.uidmapping.UidMappingUtil;
+import com.xingcloud.xa.secondaryindex.model.Index;
+import com.xingcloud.xa.secondaryindex.tail.Tail;
+import com.xingcloud.xa.secondaryindex.utils.Constants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -89,7 +91,7 @@ public class IndexTailer extends Tail implements Runnable{
       }
 
       //String hbaseAddress = UidMappingUtil.getInstance().hash(Long.valueOf(uid));
-      String hbaseAddress = "ELEX-LA-TEST1";//todo wcl
+      String hbaseAddress = "HBASE";//todo wcl
       
       if(! putsMap.containsKey(projectID)){
         putsMap.put(projectID, new HashMap<String, List<Index>>());

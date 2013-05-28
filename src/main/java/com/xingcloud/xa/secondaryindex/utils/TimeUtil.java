@@ -1,4 +1,4 @@
-package com.xingcloud.xa.secondaryindex;
+package com.xingcloud.xa.secondaryindex.utils;
 
 
 import java.text.SimpleDateFormat;

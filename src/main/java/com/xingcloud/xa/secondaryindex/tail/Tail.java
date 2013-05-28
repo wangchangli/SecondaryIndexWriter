@@ -1,4 +1,7 @@
-package com.xingcloud.xa.secondaryindex;
+package com.xingcloud.xa.secondaryindex.tail;
+
+import com.xingcloud.xa.secondaryindex.tail.BufferedTailReader;
+import com.xingcloud.xa.secondaryindex.utils.TimeUtil;
 
 import java.io.*;
 import java.util.Date;

@@ -6,7 +6,7 @@
 	</property>
 	<property>
 		<name>hbase.zookeeper.quorum</name>
-		<value>ELEX-LA-TEST1</value>
+		<value>HBASE</value>
     </property>
     <property>
         <name>hbase.zookeeper.property.clientPort</name>

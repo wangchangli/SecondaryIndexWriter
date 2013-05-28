@@ -1,12 +1,15 @@
 package com.xingcloud.xa.secondaryindex;
 
+import com.xingcloud.xa.secondaryindex.model.Index;
+import com.xingcloud.xa.secondaryindex.utils.Constants;
+import com.xingcloud.xa.secondaryindex.utils.HTableAdmin;
 import com.xingcloud.xa.secondaryindex.utils.QueryUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.hadoop.hbase.HColumnDescriptor;
-import org.apache.hadoop.hbase.HTableDescriptor;
-import org.apache.hadoop.hbase.client.*;
-import org.apache.hadoop.hbase.io.hfile.Compression;
+import org.apache.hadoop.hbase.client.Delete;
+import org.apache.hadoop.hbase.client.HConnectionManager;
+import org.apache.hadoop.hbase.client.HTable;
+import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.hbase.util.Pair;
 
@@ -26,15 +29,7 @@ import java.util.Map;
 public class HPutTask implements Runnable  {
   private static final Log LOG = LogFactory.getLog(SecondaryIndexWriter.class); 
   private String tableName;
-  private Map<String,List<Index>> indexs; //key:every hbase node
-  
-  private static Map<String, Boolean> tables;
-  private static HBaseAdmin admin;
-  
-//  static {
-//    admin = new HBaseAdmin();
-//    initTables();  
-//  }
+  private Map<String,List<Index>> indexs; //key=>every hbase node, value=>put and delete index
   
   public HPutTask(String tableName, Map<String,List<Index>> indexs){
     
@@ -51,8 +46,9 @@ public class HPutTask implements Runnable  {
         HTable table = null;
         long currentTime = System.currentTimeMillis();
         try {
-
-          table = new HTable(HBaseConf.getInstance().getTestHBaseConf(entry.getKey()),QueryUtils.getUIIndexTableName(tableName));//todo wcl
+          HTableAdmin.checkTable(entry.getKey(), tableName + "_index", "value"); // check if table is exist, if not create it
+          
+          table = new HTable(HTableAdmin.getHBaseConf(entry.getKey()),QueryUtils.getUIIndexTableName(tableName));//todo wcl
           LOG.info(tableName + " init htable .." + currentTime);
           table.setAutoFlush(false);
           table.setWriteBufferSize(Constants.WRITE_BUFFER_SIZE);
@@ -66,7 +62,7 @@ public class HPutTask implements Runnable  {
 
           putHbase = false;
           LOG.info(tableName + " " + entry.getKey() + " put hbase size:" + entry.getValue().size() +
-            " completed .tablename is " + tableName + " using "
+            " completed tablename is " + tableName + " using "
             + (System.currentTimeMillis() - currentTime) + "ms");
         } catch (IOException e) {
           if (e.getMessage().contains("interrupted")) {
@@ -74,7 +70,7 @@ public class HPutTask implements Runnable  {
           }
           LOG.error(tableName + entry.getKey() + e.getMessage(), e);
           if (e.getMessage().contains("HConnectionImplementation") && e.getMessage().contains("closed")) {
-            HConnectionManager.deleteConnection(HBaseConf.getInstance().getHBaseConf(entry.getKey()), true);
+            HConnectionManager.deleteConnection(HTableAdmin.getHBaseConf(entry.getKey()), true);
             LOG.warn("delete connection to " + entry.getKey());
           }
           putHbase = true;
@@ -150,41 +146,4 @@ public class HPutTask implements Runnable  {
      }
     return result;
   }
-
-  private static void initTables() {
-    try {
-      HTableDescriptor[] tableDescriptors = admin.listTables();
-      for(HTableDescriptor tableDescriptor: tableDescriptors){
-        tables.put(tableDescriptor.getNameAsString(), true);
-      }  
-    }catch (Exception e){      
-      e.printStackTrace();
-    }
-
-  }
-
-  private void createTable(HBaseAdmin admin, String tableName, String... families) throws IOException {
-    HTableDescriptor table = new HTableDescriptor(tableName);
-    for(String family: families){
-      HColumnDescriptor columnDescriptor = new HColumnDescriptor(family);
-      if(tableName.endsWith("_index"))
-        columnDescriptor.setMaxVersions(1);
-      columnDescriptor.setBlocksize(512 * 1024);
-      columnDescriptor.setCompressionType(Compression.Algorithm.LZO);
-      table.addFamily(columnDescriptor);
-    }
-    admin.createTable(table);
-    tables.put(tableName, true);
-  }
-
-  public void checkTable(HBaseAdmin admin, String tableName, String... families) throws IOException {
-    if(!tableExists(admin, tableName)){
-      createTable(admin, tableName, families);
-    }
-  }
-
-  private boolean tableExists(HBaseAdmin admin, String tableName) throws IOException {
-    return tables.containsKey(tableName);
-  }
-
 }

@@ -5,7 +5,7 @@
  * ORACLE PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
  */
 
-package com.xingcloud.xa.secondaryindex;
+package com.xingcloud.xa.secondaryindex.tail;
 
 
 import java.io.IOException;
