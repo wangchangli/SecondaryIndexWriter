@@ -74,7 +74,6 @@ public class IndexTailer extends Tail implements Runnable{
     Map<String, Map<String, List<Index>>> putsMap = new HashMap<String, Map<String, List<Index>>>();
     ObjectMapper mapper = new ObjectMapper();
     for(String log: logs){
-      
       Map<String,Object> data = mapper.readValue(log.getBytes(), Map.class);
       String projectID = (String)data.get("pid");
       long uid = Long.valueOf(String.valueOf(data.get("uid")));

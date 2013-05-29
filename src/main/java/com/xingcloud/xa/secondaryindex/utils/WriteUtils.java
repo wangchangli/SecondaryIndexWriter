@@ -31,7 +31,7 @@ public class WriteUtils {
     }
 
     public static byte[] getUIIndexRowKey(int propertyID, String date, String attrVal) {
-        return bytesCombine(Bytes.toBytes((short)propertyID), Bytes.toBytes(date), Bytes.toBytes(attrVal));
+        return bytesCombine(Bytes.toBytes((short)propertyID), Bytes.toBytes(date), Bytes.toBytesBinary(attrVal));
     }
 
     public static String getUIIndexTableName(String pID) {
